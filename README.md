@@ -28,52 +28,29 @@ To set up the server, go to [PNT Player API](https://github.com/projectninjatech
 To set up and run the React Native app, follow these steps:
 
 1.  Clone this repository:
-    
-    sh
-    
-    Copy code
-    
-    `git clone https://github.com/projectninjatech/PNT-Player.git` 
+    ```plaintext
+   `git clone https://github.com/projectninjatech/PNT-Player.git` 
     
 2.  Navigate to the project directory:
-    
-    sh
-    
-    Copy code
-    
-    `cd PNT-Player` 
+
+    ```plaintext
+   `cd PNT-Player` 
     
 3.  Install the dependencies:
-    
-    sh
-    
-    Copy code
-    
-    `npm install` 
+    ```plaintext
+   `npm install` 
     
 4.  Start the Metro bundler:
-    
-    sh
-    
-    Copy code
-    
-    `npx react-native start` 
+   ```plaintext
+   `npx react-native start` 
     
 5.  Run the app on an Android device or emulator:
-    
-    sh
-    
-    Copy code
-    
-    `npx react-native run-android` 
+   ```plaintext
+   `npx react-native run-android` 
     
     Or, run the app on an iOS device or simulator:
-    
-    sh
-    
-    Copy code
-    
-    `npx react-native run-ios` 
+   ```plaintext
+   `npx react-native run-ios` 
     
 
 ## Contributing
