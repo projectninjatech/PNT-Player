@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StatusBar, Image, StyleSheet, TouchableOpacity, BackHandler, Alert } from 'react-native'
 import React from 'react'
 import Video from 'react-native-video';
 import Orientation from 'react-native-orientation-locker';
@@ -16,7 +16,6 @@ import AudioSubsModal from '../components/AudioSubsModal';
 import { PanGestureHandler, GestureHandlerRootView } from 'react-native-gesture-handler';
 import DoubleTap from '../components/DoubleTap';
 import DeviceInfo from 'react-native-device-info';
-
 
 export default function VideoPlayer({ route }) {
 
@@ -393,7 +392,7 @@ export default function VideoPlayer({ route }) {
                         </View>
 
 
-                        <View style={[styles.sliderContainer, { opacity: videoPressed ? 1 : 0, }]}>
+                        {/* <View style={[styles.sliderContainer, { opacity: videoPressed ? 1 : 0, }]}>
                             <Text style={styles.sliderText}>{formatDuration(progress.currentTime)}</Text>
                             <Slider
                                 style={styles.sliderProgressBar}
@@ -406,11 +405,10 @@ export default function VideoPlayer({ route }) {
                                     ref.current.seek(prog);
                                 }}
                                 value={progress.currentTime}
-
                             />
 
                             <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration)}</Text>
-                        </View>
+                        </View> */}
 
                         {
                             !isBuffering && (
@@ -444,6 +442,24 @@ export default function VideoPlayer({ route }) {
                     </TouchableOpacity>
                 </TouchableOpacity>
             </PanGestureHandler>
+
+            <View style={[styles.sliderContainer, { opacity: videoPressed ? 1 : 0, }]}>
+                <Text style={styles.sliderText}>{formatDuration(progress.currentTime)}</Text>
+                <Slider
+                    style={styles.sliderProgressBar}
+                    minimumValue={0}
+                    maximumValue={progress.seekableDuration}
+                    minimumTrackTintColor="red"
+                    maximumTrackTintColor="white"
+                    thumbTintColor="red"
+                    onValueChange={(prog) => {
+                        ref.current.seek(prog);
+                    }}
+                    value={progress.currentTime}
+                />
+
+                <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration)}</Text>
+            </View>
         </GestureHandlerRootView>
     )
 }
@@ -474,7 +490,7 @@ var styles = StyleSheet.create({
         top: 15,
         paddingLeft: 20,
         paddingRight: 20,
-        zIndex:1999
+        zIndex: 1999
     },
     goBackIcon: {
         width: 30,
@@ -508,24 +524,25 @@ var styles = StyleSheet.create({
     sliderContainer: {
         // backgroundColor: 'blue',
         width: '90%',
-        height: '25%',
+        // height: '25%',
         flexDirection: 'row',
         position: 'absolute',
-        bottom: 0,
+        bottom: '20%',
         paddingLeft: 20,
         paddingRight: 20,
         alignItems: 'center',
         justifyContent: 'center',
+        alignSelf: 'center'
     },
 
     sliderProgressBar: {
         flex: 1,
         color: 'red',
-        bottom: 40
+        // bottom: 40
     },
     sliderText: {
         color: 'white',
-        bottom: 40
+        // bottom: 40
     },
 
 });

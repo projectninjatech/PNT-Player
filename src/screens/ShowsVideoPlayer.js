@@ -113,7 +113,7 @@ export default function ShowsVideoPlayer({ route }) {
         const setVideoplayerStartupBrightness = async () => {
             setBrightnessLevel(brightness)
         }
-        
+
         setVideoplayerStartupBrightness()
     }, []);
 
@@ -414,7 +414,7 @@ export default function ShowsVideoPlayer({ route }) {
                         </View>
 
 
-                        <View style={[styles.sliderContainer, { opacity: videoPressed ? 1 : 0, }]}>
+                        {/* <View style={[styles.sliderContainer, { opacity: videoPressed ? 1 : 0, }]}>
                             <Text style={styles.sliderText}>{formatDuration(progress.currentTime)}</Text>
                             <Slider
                                 style={styles.sliderProgressBar}
@@ -431,7 +431,7 @@ export default function ShowsVideoPlayer({ route }) {
                             />
 
                             <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration)}</Text>
-                        </View>
+                        </View> */}
 
                         {
                             !isBuffering && (
@@ -469,6 +469,26 @@ export default function ShowsVideoPlayer({ route }) {
                     </TouchableOpacity>
                 </TouchableOpacity>
             </PanGestureHandler>
+
+            <View style={[styles.sliderContainer, { opacity: videoPressed ? 1 : 0, }]}>
+                <Text style={styles.sliderText}>{formatDuration(progress.currentTime)}</Text>
+                <Slider
+                    style={styles.sliderProgressBar}
+                    minimumValue={0}
+                    maximumValue={progress.seekableDuration}
+                    minimumTrackTintColor="red"
+                    maximumTrackTintColor="white"
+                    thumbTintColor="red"
+                    onValueChange={(prog) => {
+                        ref.current.seek(prog);
+                    }}
+                    value={progress.currentTime}
+
+                />
+
+                <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration)}</Text>
+            </View>
+
         </GestureHandlerRootView>
     )
 }
@@ -531,24 +551,25 @@ var styles = StyleSheet.create({
     sliderContainer: {
         // backgroundColor: 'blue',
         width: '90%',
-        height: '30%',
+        // height: '30%',
         flexDirection: 'row',
         position: 'absolute',
-        bottom: 0,
+        bottom:'20%',
         paddingLeft: 20,
         paddingRight: 20,
         alignItems: 'center',
         justifyContent: 'center',
+        alignSelf: 'center'
     },
 
     sliderProgressBar: {
         flex: 1,
         color: 'red',
-        bottom: 30
+        // bottom: 30
     },
     sliderText: {
         color: 'white',
-        bottom: 30
+        // bottom: 30
     },
 
 });

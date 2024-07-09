@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native'
 import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import FastImage from 'react-native-fast-image';
 import React from 'react'
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   movieCardContainer: {
     borderRadius: 20,
-    paddingHorizontal:10
+    paddingHorizontal:8
   },
   moviecardImage: {
     height: '100%',

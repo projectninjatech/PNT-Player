@@ -23,7 +23,7 @@ export default function HomeScreen({ route }) {
     React.useEffect(() => {
         const moviesListAPICall = async () => {
             const movies = await moviesListAPI();
-            console.log("Movies list are as", movies)
+            // console.log("Movies list are as", movies)
             setmoviesList(movies)
             if (DeviceInfo.getDeviceType() === "Tablet") {
                 setIsTablet(true)
@@ -55,7 +55,7 @@ export default function HomeScreen({ route }) {
         fetchAllGenres();
     }, []);
 
-    console.log("Movies genres are", allGenres)
+    // console.log("Movies genres are", allGenres)
 
 
     useFocusEffect(

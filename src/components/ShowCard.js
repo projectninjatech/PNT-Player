@@ -2,6 +2,7 @@
 import React from 'react';
 import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import FastImage from 'react-native-fast-image';
 
 const ShowCard = ({ genre, showsList, handleShowDetails, isTablet }) => {
   // console.log("Showlist are", showsList)
@@ -19,7 +20,12 @@ const ShowCard = ({ genre, showsList, handleShowDetails, isTablet }) => {
 
   const renderShowCards = ({ item }) => (
     <TouchableOpacity onPress={() => handleShowDetails(item)} style={[styles.showCardContainer, { marginRight: isTablet ? 20 : 10 }]}>
-      <Image source={{ uri: item.posterPath }} style={[styles.showCardImage, { width: isTablet ? 250 : 150 }]} />
+      {/* <Image source={{ uri: item.posterPath }} style={[styles.showCardImage, { width: isTablet ? 250 : 150 }]} /> */}
+      <FastImage
+        style={[styles.showCardImage, { width: isTablet ? 250 : 150 }]}
+        source={{ uri: item.posterPath, priority: FastImage.priority.normal }}
+        resizeMode={FastImage.resizeMode.cover}
+      />
     </TouchableOpacity>
   );
 
