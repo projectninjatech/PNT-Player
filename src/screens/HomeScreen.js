@@ -11,6 +11,7 @@ import MylistMovies from '../components/MylistMovies';
 import ContinueWatching from '../components/ContinueWatching';
 import { useFocusEffect } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen({ route }) {
     const navigation = useNavigation();
@@ -97,8 +98,23 @@ export default function HomeScreen({ route }) {
         navigation.navigate('MovieDetails', { movie });
     }
 
-    const posterPlayButton = (movieID, movieLink, movieTitle) => {
-        navigation.navigate('VideoPlayer', { movieID, movieLink, movieTitle });
+    const posterPlayButton = async (movieID, movieLink, movieTitle) => {
+        // console.log("Movie link", movieLink)
+        // navigation.navigate('VideoPlayer', { movieID, movieLink, movieTitle });
+
+        try {
+            const httpAddress = await AsyncStorage.getItem('httpAddress');
+            if (httpAddress) {
+                const updatedLink = movieLink.replace(/^https?:\/\/[^\/]+/, httpAddress);
+                console.log("Updated Movie link", updatedLink);
+                navigation.navigate('VideoPlayer', { movieID, movieLink: updatedLink, movieTitle });
+            } else {
+                console.log("Movie link", movieLink);
+                navigation.navigate('VideoPlayer', { movieID, movieLink, movieTitle });
+            }
+        } catch (error) {
+            console.error("Error fetching httpAddress from AsyncStorage:", error);
+        }
     }
 
     const posterInfoButton = (movie) => {

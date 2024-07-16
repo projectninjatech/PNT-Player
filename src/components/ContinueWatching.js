@@ -6,6 +6,7 @@ import { getAllWatchTimes, removeWatchedMovie } from '../api/userMovieWatchtimeA
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ContinueWatching = ({ watchedMovieList, label, isTablet }) => {
 
@@ -22,8 +23,21 @@ const ContinueWatching = ({ watchedMovieList, label, isTablet }) => {
         fetchMovies();
     }, [watchedMovieList]);
 
-    const handleMovieDetails = (movieID, movieLink, movieTitle) => {
-        navigation.navigate('VideoPlayer', { movieID, movieLink, movieTitle });
+    const handleMovieDetails = async (movieID, movieLink, movieTitle) => {
+        // navigation.navigate('VideoPlayer', { movieID, movieLink, movieTitle });
+        try {
+            const httpAddress = await AsyncStorage.getItem('httpAddress');
+            if (httpAddress) {
+                const updatedLink = movieLink.replace(/^https?:\/\/[^\/]+/, httpAddress);
+                console.log("Updated Movie link", updatedLink);
+                navigation.navigate('VideoPlayer', { movieID, movieLink: updatedLink, movieTitle });
+            } else {
+                console.log("Movie link", movieLink);
+                navigation.navigate('VideoPlayer', { movieID, movieLink, movieTitle });
+            }
+        } catch (error) {
+            console.error("Error fetching httpAddress from AsyncStorage:", error);
+        }
     }
 
     const handleInfoIconPress = (movie) => {

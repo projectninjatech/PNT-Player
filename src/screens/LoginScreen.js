@@ -10,22 +10,6 @@ const LoginScreen = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    // React.useEffect(() => {
-    //     const checkauthuser = async () => {
-    //         const response = await checkAuthAPI();
-    //         console.log("User auth", response)
-    //         if (response.authenticated) {
-    //             navigation.navigate('BottomTabNavigator', {
-    //                 screen: 'HomeScreen',
-    //                 params: { mylist: response.user.mylist, watchedMovies: response.user.watchedMovies,},
-    //               });
-    //         }
-    //     }
-
-    //     checkauthuser();
-    // }, [])
-
-
     const handleLogin = async () => {
         // console.log('Logging in with:', { username, password });
         const responseData = await userloginAPI(username, password);

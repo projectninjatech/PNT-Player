@@ -13,7 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { VolumeManager } from 'react-native-volume-manager';
 import { setBrightnessLevel, getBrightnessLevel } from '@reeq/react-native-device-brightness';
 import AudioSubsModal from '../components/AudioSubsModal';
-import { PanGestureHandler, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { PanGestureHandler, GestureHandlerRootView, State } from 'react-native-gesture-handler';
 import DoubleTap from '../components/DoubleTap';
 import DeviceInfo from 'react-native-device-info';
 
@@ -37,6 +37,8 @@ export default function VideoPlayer({ route }) {
     const [volume, setVolume] = React.useState(0.5);
     const [brightness, setBrightness] = React.useState(0.5);
     const [isTablet, setIsTablet] = React.useState(false)
+    const [showVolumeSlider, setShowVolumeSlider] = React.useState(false);
+    const sliderTimeout = React.useRef(null);
 
     const ref = React.useRef();
 
@@ -208,6 +210,26 @@ export default function VideoPlayer({ route }) {
         return `${formattedHours}${formattedMinutes}${formattedSeconds}`;
     };
 
+    const handleVolumeGesture = ({ nativeEvent }) => {
+
+        if (nativeEvent.state === State.ACTIVE) {
+            // console.log("Volume native",nativeEvent.translationY)
+            const sensitivity = 10000;
+            const newVolume = volume - nativeEvent.translationY / sensitivity;
+            const clampedVolume = Math.max(0, Math.min(1, newVolume));
+            handleVolumeChange(clampedVolume);
+            setShowVolumeSlider(true);
+
+            if (sliderTimeout.current) {
+                clearTimeout(sliderTimeout.current);
+            }
+
+            sliderTimeout.current = setTimeout(() => {
+                setShowVolumeSlider(false);
+            }, 2000);
+        }
+    };
+
 
     return (
         <GestureHandlerRootView style={styles.container}>
@@ -240,7 +262,6 @@ export default function VideoPlayer({ route }) {
                         backBufferDurationMs={15000}
                         onLoad={(videoInfo) => {
                             console.log("Video Loaded...", videoInfo)
-                            // console.log(videoInfo)
                             if (watchTime > 0) {
                                 ref.current.seek(watchTime);
                             }
@@ -361,6 +382,10 @@ export default function VideoPlayer({ route }) {
                             />
                         </View>
 
+                        <PanGestureHandler onGestureEvent={handleVolumeGesture}>
+                            <View style={styles.volumeControlArea} />
+                        </PanGestureHandler>
+
                         <View style={{
                             // backgroundColor: 'green',
                             width: '15%',
@@ -373,7 +398,7 @@ export default function VideoPlayer({ route }) {
                             paddingLeft: 0,
                             paddingRight: 60,
                             alignItems: 'center',
-                            opacity: videoPressed ? 1 : 0
+                            opacity: videoPressed || showVolumeSlider ? 1 : 0
                         }}>
                             <Icon name="volume-up" size={30} color="white" />
                             <VerticalSlider
@@ -458,7 +483,7 @@ export default function VideoPlayer({ route }) {
                     value={progress.currentTime}
                 />
 
-                <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration)}</Text>
+                <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration - progress.currentTime)}</Text>
             </View>
         </GestureHandlerRootView>
     )
@@ -543,6 +568,14 @@ var styles = StyleSheet.create({
     sliderText: {
         color: 'white',
         // bottom: 40
+    },
+    volumeControlArea: {
+        // backgroundColor:'green',
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        width: '20%',
     },
 
 });

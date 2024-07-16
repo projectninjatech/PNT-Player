@@ -22,7 +22,8 @@ const MovieBanner = ({ moviesList, mylist, handleBanner, posterPlayButton, poste
         return array;
     };
 
-    console.log("Moviebanner Tablet is", isTablet)
+    // console.log("Moviebanner Tablet is", isTablet)
+    
     const moveToShowsScreen = () => {
         navigation.navigate('ShowsTabNav')
     }

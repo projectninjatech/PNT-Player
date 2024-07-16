@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, BackHandler, TextInput, Alert } from 'react-native'
 import React from 'react'
 import { userLogout } from '../api/userloginAPI';
 import { useNavigation } from '@react-navigation/native';
@@ -12,6 +12,7 @@ export default function SettingsScreen() {
     const navigation = useNavigation();
 
     const [brightness, setBrightness] = React.useState(0.5);
+    const [httpAddress, setHttpAddress] = React.useState('');
 
     const handlelogout = async () => {
         const responseData = await userLogout();
@@ -32,9 +33,42 @@ export default function SettingsScreen() {
 
     }
 
+    const handleApplyHttpAddress = async () => {
+        if (!httpAddress.trim()) {
+            Alert.alert('Error', 'Please enter an HTTP video server address.');
+            return;
+        }
+
+        if (httpAddress) {
+            await AsyncStorage.setItem('httpAddress', httpAddress);
+            console.log("HTTP Address saved:", httpAddress);
+            Alert.alert("HTTP Server IP updated", "HTTP Server IP has been added successfully!")
+        }
+    };
+
+    const handleRestoreDefault = async () => {
+        await AsyncStorage.removeItem('httpAddress');
+        setHttpAddress('');
+        console.log("HTTP Address removed");
+        Alert.alert("HTTP Server IP restored", "Default HTTP Server IP has been restored successfully!")
+    };
+
     return (
         <View style={styles.container}>
             <Image source={require('../assets/logo.png')} style={styles.logo} />
+            <TextInput
+                style={styles.textInput}
+                placeholder="Enter HTTP video server address"
+                placeholderTextColor="grey"
+                onChangeText={setHttpAddress}
+                value={httpAddress}
+            />
+            <TouchableOpacity style={[styles.button, { backgroundColor: 'green' }]} onPress={handleApplyHttpAddress}>
+                <Text style={styles.buttonText}>Apply</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.button, { backgroundColor: 'orange' }]} onPress={handleRestoreDefault}>
+                <Text style={styles.buttonText}>Restore Default</Text>
+            </TouchableOpacity>
             <View style={styles.sliderContainer}>
                 <View style={styles.iconTextContainer}>
                     <Icon name="brightness-7" size={30} color="white" />
@@ -52,11 +86,16 @@ export default function SettingsScreen() {
                     value={brightness}
                 />
             </View>
+
             <TouchableOpacity style={[styles.button, { backgroundColor: 'royalblue' }]} onPress={changeServer}>
                 <Text style={styles.buttonText}>Change Server</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.button, { backgroundColor: '#EB1825', }]} onPress={handlelogout}>
+            <TouchableOpacity style={[styles.button, { backgroundColor: '#E97451', }]} onPress={handlelogout}>
                 <Text style={styles.buttonText}>Logout</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.button, { backgroundColor: '#EB1825', }]} onPress={() => BackHandler.exitApp()}>
+                <Text style={styles.buttonText}>Exit</Text>
             </TouchableOpacity>
             {/* <Text style={styles.infoText}>This app is developed by Imran Ansari @projectninjatech. It is built for educational purposes. Please note that the developer is not responsible for any unwanted use of the app and does not promote or endorse piracy of any content.</Text> */}
         </View>
@@ -112,5 +151,15 @@ const styles = StyleSheet.create({
     },
     sliderProgressBar: {
         width: '100%',
+    },
+    textInput: {
+        width: '80%',
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginVertical: 10,
+        color: 'white',
     },
 })

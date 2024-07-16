@@ -9,6 +9,7 @@ import { similarMoviesAPI } from '../api/similarMoviesAPI';
 import SimilarMovies from '../components/SimilarMovies';
 import MiniVideoplayer from '../components/MiniVideoplayer';
 import DeviceInfo from 'react-native-device-info';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MovieDetails({ route }) {
 
@@ -49,8 +50,21 @@ export default function MovieDetails({ route }) {
         navigation.goBack();
     }
 
-    const playMovie = (movieID, movieLink, movieTitle) => {
-        navigation.navigate('VideoPlayer', { movieID, movieLink, movieTitle });
+    const playMovie = async (movieID, movieLink, movieTitle) => {
+        // navigation.navigate('VideoPlayer', { movieID, movieLink, movieTitle });
+        try {
+            const httpAddress = await AsyncStorage.getItem('httpAddress');
+            if (httpAddress) {
+                const updatedLink = movieLink.replace(/^https?:\/\/[^\/]+/, httpAddress);
+                console.log("Updated Movie link", updatedLink);
+                navigation.navigate('VideoPlayer', { movieID, movieLink: updatedLink, movieTitle });
+            } else {
+                console.log("Movie link", movieLink);
+                navigation.navigate('VideoPlayer', { movieID, movieLink, movieTitle });
+            }
+        } catch (error) {
+            console.error("Error fetching httpAddress from AsyncStorage:", error);
+        }
     }
 
     return (

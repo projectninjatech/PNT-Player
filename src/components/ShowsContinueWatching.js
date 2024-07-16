@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native'
 import { responsiveHeight as rh, responsiveWidth as rw, responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import { useFocusEffect } from '@react-navigation/native';
 import { getAllShowsWatchtime, removeShowWatchtime } from '../api/userShowsWatchtimeAPI';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ShowsContinueWatching = ({ allshowsList, label, isTablet }) => {
 
@@ -46,8 +47,36 @@ const ShowsContinueWatching = ({ allshowsList, label, isTablet }) => {
         }, [allshowsList])
     );
 
-    const handleShowPlay = (episodeID, episodeLink, episodeName) => {
-        navigation.navigate('ShowsVideoPlayer', { episodeID, episodeLink, episodeName });
+    const handleShowPlay = async (episodeID, episodeLink, episodeName) => {
+        // navigation.navigate('ShowsVideoPlayer', { episodeID, episodeLink, episodeName });
+        try {
+            if(!episodeLink || episodeLink === '') {
+                Alert.alert("Episode not available", "This episode is not currently available!")
+                return
+            }
+            const httpAddress = await AsyncStorage.getItem('httpAddress');
+            if (httpAddress) {
+                let updatedLink = episodeLink.replace(/^https?:\/\/[^\/]+/, httpAddress);
+                // Check and remove the ._ prefix if it exists
+                const prefixToRemove = "._";
+                const prefixIndex = updatedLink.indexOf(prefixToRemove);
+                if (prefixIndex !== -1) {
+                    updatedLink = updatedLink.slice(0, prefixIndex) + updatedLink.slice(prefixIndex + prefixToRemove.length);
+                }
+                console.log("Updated Episode link", updatedLink);
+                navigation.navigate("ShowsVideoPlayer", { episodeID, episodeLink: updatedLink, episodeName })
+            } else {
+                const prefixToRemove = "._";
+                const prefixIndex = episodeLink.indexOf(prefixToRemove);
+                if (prefixIndex !== -1) {
+                    episodeLink = episodeLink.slice(0, prefixIndex) + episodeLink.slice(prefixIndex + prefixToRemove.length);
+                }
+                console.log("Episode link", episodeLink);
+                navigation.navigate("ShowsVideoPlayer", { episodeID, episodeLink, episodeName })
+            }
+        } catch (error) {
+            console.error("Error fetching httpAddress from AsyncStorage:", error);
+        }
     }
 
     const findShowById = (showId) => {

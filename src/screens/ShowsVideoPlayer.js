@@ -15,7 +15,7 @@ import { setBrightnessLevel, getBrightnessLevel } from '@reeq/react-native-devic
 import { getAllEpisodeList } from '../api/showsList';
 import EpisodeListModal from '../components/EpisodeListModal';
 import AudioSubsModal from '../components/AudioSubsModal';
-import { PanGestureHandler, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { PanGestureHandler, GestureHandlerRootView, State } from 'react-native-gesture-handler';
 import DoubleTap from '../components/DoubleTap';
 import DeviceInfo from 'react-native-device-info';
 
@@ -36,12 +36,14 @@ export default function ShowsVideoPlayer({ route }) {
     const [isBuffering, setIsBuffering] = React.useState(true)
     const [watchTime, setWatchtime] = React.useState(0);
     const [resizeMode, setResizeMode] = React.useState("cover");
-    const [volume, setVolume] = React.useState(1);
+    const [volume, setVolume] = React.useState(0.5);
     const [brightness, setBrightness] = React.useState(0.5);
     const [episodesList, setEpisodesList] = React.useState([]);
     const [episodeListVisible, setEpisodeListVisible] = React.useState(false);
     const [audioSubsModalVisible, setAudioSubsModalVisible] = React.useState(false);
     const [isTablet, setIsTablet] = React.useState(false)
+    const [showVolumeSlider, setShowVolumeSlider] = React.useState(false);
+    const sliderTimeout = React.useRef(null);
 
     const ref = React.useRef();
 
@@ -224,6 +226,26 @@ export default function ShowsVideoPlayer({ route }) {
         return `${formattedHours}${formattedMinutes}${formattedSeconds}`;
     };
 
+    const handleVolumeGesture = ({ nativeEvent }) => {
+
+        if (nativeEvent.state === State.ACTIVE) {
+            // console.log("Volume native",nativeEvent.translationY)
+            const sensitivity = 10000;
+            const newVolume = volume - nativeEvent.translationY / sensitivity;
+            const clampedVolume = Math.max(0, Math.min(1, newVolume));
+            handleVolumeChange(clampedVolume);
+            setShowVolumeSlider(true);
+
+            if (sliderTimeout.current) {
+                clearTimeout(sliderTimeout.current);
+            }
+
+            sliderTimeout.current = setTimeout(() => {
+                setShowVolumeSlider(false);
+            }, 2000);
+        }
+    };
+
 
     return (
         <GestureHandlerRootView style={styles.container}>
@@ -302,7 +324,7 @@ export default function ShowsVideoPlayer({ route }) {
                         }}
                         ref={ref}
                         onProgress={prog => {
-                            // console.log(prog);
+                            // console.log("Progress",prog);
                             setProgress(prog)
                         }}
                         resizeMode={resizeMode}
@@ -383,6 +405,10 @@ export default function ShowsVideoPlayer({ route }) {
                             />
                         </View>
 
+                        <PanGestureHandler onGestureEvent={handleVolumeGesture}>
+                            <View style={styles.volumeControlArea} />
+                        </PanGestureHandler>
+
                         <View style={{
                             // backgroundColor: 'green',
                             width: '15%',
@@ -395,7 +421,7 @@ export default function ShowsVideoPlayer({ route }) {
                             paddingLeft: 0,
                             paddingRight: 60,
                             alignItems: 'center',
-                            opacity: videoPressed ? 1 : 0
+                            opacity: videoPressed || showVolumeSlider ? 1 : 0
                         }}>
                             <Icon name="volume-up" size={30} color="white" />
                             <VerticalSlider
@@ -413,25 +439,6 @@ export default function ShowsVideoPlayer({ route }) {
                             />
                         </View>
 
-
-                        {/* <View style={[styles.sliderContainer, { opacity: videoPressed ? 1 : 0, }]}>
-                            <Text style={styles.sliderText}>{formatDuration(progress.currentTime)}</Text>
-                            <Slider
-                                style={styles.sliderProgressBar}
-                                minimumValue={0}
-                                maximumValue={progress.seekableDuration}
-                                minimumTrackTintColor="red"
-                                maximumTrackTintColor="white"
-                                thumbTintColor="red"
-                                onValueChange={(prog) => {
-                                    ref.current.seek(prog);
-                                }}
-                                value={progress.currentTime}
-
-                            />
-
-                            <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration)}</Text>
-                        </View> */}
 
                         {
                             !isBuffering && (
@@ -486,7 +493,7 @@ export default function ShowsVideoPlayer({ route }) {
 
                 />
 
-                <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration)}</Text>
+                <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration - progress.currentTime)}</Text>
             </View>
 
         </GestureHandlerRootView>
@@ -570,6 +577,14 @@ var styles = StyleSheet.create({
     sliderText: {
         color: 'white',
         // bottom: 30
+    },
+    volumeControlArea: {
+        // backgroundColor:'green',
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        width: '20%',
     },
 
 });

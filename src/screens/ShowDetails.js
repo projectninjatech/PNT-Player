@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, ScrollView, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native'
+import { View, Text, StatusBar, ScrollView, TouchableOpacity, StyleSheet, Modal, FlatList, Alert } from 'react-native'
 import React from 'react'
 import Icon from 'react-native-vector-icons/dist/AntDesign';
 import FAIcon from 'react-native-vector-icons/dist/FontAwesome5';
@@ -7,6 +7,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import MiniVideoplayer from '../components/MiniVideoplayer';
 import EpisodeList from '../components/EpisodeList';
 import DeviceInfo from 'react-native-device-info';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { getLatestWatchedEpisodeID } from '../api/userShowsWatchtimeAPI';
 import { responsiveFontSize } from 'react-native-responsive-dimensions';
@@ -85,7 +86,36 @@ export default function ShowDetails({ route }) {
                 episodeName = show.seasons[0].episodes[0].name
             }
 
-            navigation.navigate("ShowsVideoPlayer", { episodeID, episodeLink, episodeName })
+            try {
+                if(!episodeLink || episodeLink === '') {
+                    Alert.alert("Episode not available", "This episode is not currently available!")
+                    return
+                }
+                const httpAddress = await AsyncStorage.getItem('httpAddress');
+                if (httpAddress) {
+                    let updatedLink = episodeLink.replace(/^https?:\/\/[^\/]+/, httpAddress);
+                    // Check and remove the ._ prefix if it exists
+                    const prefixToRemove = "._";
+                    const prefixIndex = updatedLink.indexOf(prefixToRemove);
+                    if (prefixIndex !== -1) {
+                        updatedLink = updatedLink.slice(0, prefixIndex) + updatedLink.slice(prefixIndex + prefixToRemove.length);
+                    }
+                    console.log("Updated Episode link", updatedLink);
+                    navigation.navigate("ShowsVideoPlayer", { episodeID, episodeLink: updatedLink, episodeName })
+                } else {
+                    const prefixToRemove = "._";
+                    const prefixIndex = episodeLink.indexOf(prefixToRemove);
+                    if (prefixIndex !== -1) {
+                        episodeLink = episodeLink.slice(0, prefixIndex) + episodeLink.slice(prefixIndex + prefixToRemove.length);
+                    }
+                    console.log("Episode link", episodeLink);
+                    navigation.navigate("ShowsVideoPlayer", { episodeID, episodeLink, episodeName })
+                }
+            } catch (error) {
+                console.error("Error fetching httpAddress from AsyncStorage:", error);
+            }
+
+            // navigation.navigate("ShowsVideoPlayer", { episodeID, episodeLink, episodeName })
 
         } catch (error) {
             console.error("Error playing the show:", error);
