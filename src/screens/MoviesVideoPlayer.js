@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, Image, StyleSheet, TouchableOpacity, BackHandler, Alert } from 'react-native'
+import { View, Text, StatusBar, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Video from 'react-native-video';
 import Orientation from 'react-native-orientation-locker';
@@ -416,25 +416,6 @@ export default function VideoPlayer({ route }) {
                             />
                         </View>
 
-
-                        {/* <View style={[styles.sliderContainer, { opacity: videoPressed ? 1 : 0, }]}>
-                            <Text style={styles.sliderText}>{formatDuration(progress.currentTime)}</Text>
-                            <Slider
-                                style={styles.sliderProgressBar}
-                                minimumValue={0}
-                                maximumValue={progress.seekableDuration}
-                                minimumTrackTintColor="red"
-                                maximumTrackTintColor="white"
-                                thumbTintColor="red"
-                                onValueChange={(prog) => {
-                                    ref.current.seek(prog);
-                                }}
-                                value={progress.currentTime}
-                            />
-
-                            <Text style={styles.sliderText}>{formatDuration(progress.seekableDuration)}</Text>
-                        </View> */}
-
                         {
                             !isBuffering && (
                                 <View
@@ -499,7 +480,7 @@ var styles = StyleSheet.create({
         height: '100%',
     },
     videoscreenContainer: {
-        // backgroundColor: 'red',
+        // backgroundColor: 'green',
         width: '100%',
         position: 'absolute',
         justifyContent: 'center',
